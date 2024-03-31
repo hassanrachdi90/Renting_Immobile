@@ -38,5 +38,50 @@ namespace Renting_Immobile.Controllers
             return View();
             
         }
+
+        public IActionResult Update(int villaId)
+        {
+            Villa? obj= _db.Villas.FirstOrDefault(x => x.Id == villaId);
+            if (obj == null)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            return View(obj);  
+        }
+        [HttpPost]
+        public IActionResult Update(Villa obj)
+        {
+            if (ModelState.IsValid && obj.Id>0)
+            {
+                _db.Villas.Update(obj);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+
+            }
+            return View();
+        }
+
+        public IActionResult Delete(int villaId)
+        {
+            Villa? obj = _db.Villas.FirstOrDefault(x => x.Id == villaId);
+            if (obj is null)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            return View(obj);
+        }
+        [HttpPost]
+        public IActionResult Delete(Villa obj)
+        {
+            Villa? objFromId = _db.Villas.FirstOrDefault(x => x.Id == obj.Id);
+            if (objFromId is not null)
+            {
+                _db.Villas.Remove(objFromId);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+
+            }
+            return View();
+        }
     }
 }
