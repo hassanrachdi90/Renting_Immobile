@@ -1,19 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Renting.Application.Common.Interfaces;
 using Renting.Domain.Entities;
 using Renting.Infrastructure.Data;
+using Renting.Infrastructure.Repository;
 
 namespace Renting_Immobile.Controllers
 {
     public class VillaController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public VillaController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public VillaController(IUnitOfWork unitOfWork)
         {
-            _db=db;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            var villas = _db.Villas.ToList();
+            var villas = _unitOfWork.Villa.GetAll();
             return View(villas);
         }
         public IActionResult Create()
@@ -30,8 +33,8 @@ namespace Renting_Immobile.Controllers
             }
             if (ModelState.IsValid)
             {
-                _db.Villas.Add(obj);
-                _db.SaveChanges();
+                _unitOfWork.Villa.Add(obj);
+                _unitOfWork.Villa.Save();
                 TempData["success"] = "The villa has been created successfully .";
                 return RedirectToAction(nameof(Index));
                 
@@ -42,7 +45,7 @@ namespace Renting_Immobile.Controllers
 
         public IActionResult Update(int villaId)
         {
-            Villa? obj= _db.Villas.FirstOrDefault(x => x.Id == villaId);
+            Villa? obj= _unitOfWork.Villa.Get(x => x.Id == villaId);
             if (obj == null)
             {
                 return RedirectToAction("Error", "Home");
@@ -54,8 +57,8 @@ namespace Renting_Immobile.Controllers
         {
             if (ModelState.IsValid && obj.Id>0)
             {
-                _db.Villas.Update(obj);
-                _db.SaveChanges();
+                _unitOfWork.Villa.Update(obj);
+                _unitOfWork.Villa.Save();
                 TempData["success"] = "The villa has been updated successfully .";
                 return RedirectToAction(nameof(Index));
 
@@ -65,7 +68,7 @@ namespace Renting_Immobile.Controllers
 
         public IActionResult Delete(int villaId)
         {
-            Villa? obj = _db.Villas.FirstOrDefault(x => x.Id == villaId);
+            Villa? obj = _unitOfWork.Villa.Get(x => x.Id == villaId);
             if (obj is null)
             {
                 return RedirectToAction("Error", "Home");
@@ -75,11 +78,11 @@ namespace Renting_Immobile.Controllers
         [HttpPost]
         public IActionResult Delete(Villa obj)
         {
-            Villa? objFromId = _db.Villas.FirstOrDefault(x => x.Id == obj.Id);
+            Villa? objFromId = _unitOfWork.Villa.Get(x => x.Id == obj.Id);
             if (objFromId is not null)
             {
-                _db.Villas.Remove(objFromId);
-                _db.SaveChanges();
+                _unitOfWork.Villa.Remove(objFromId);
+                _unitOfWork.Villa.Save();
                 TempData["success"] = "The villa has been deleted successfully .";
                 return RedirectToAction(nameof(Index));
 
