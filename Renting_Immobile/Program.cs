@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Renting.Application.Common.Interfaces;
+using Renting.Domain.Entities;
 using Renting.Infrastructure.Data;
 using Renting.Infrastructure.Repository;
 using System;
@@ -11,6 +13,7 @@ builder.Services.AddControllersWithViews();
 // Add DbContext Configuration
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddIdentity<ApplicationUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 var app = builder.Build();
 
