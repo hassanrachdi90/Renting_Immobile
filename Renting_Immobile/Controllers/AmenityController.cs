@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Renting.Application.Common.Interfaces;
+using Renting.Application.Utility;
 using Renting.Domain.Entities;
 using Renting.Infrastructure.Data;
 using Renting_Immobile.ViewModels;
 
 namespace Renting_Immobile.Controllers
 {
+    [Authorize(Roles =SD.Role_Admin)]
     public class AmenityController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

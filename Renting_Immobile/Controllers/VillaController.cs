@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Renting.Application.Common.Interfaces;
+using Renting.Application.Utility;
 using Renting.Domain.Entities;
 using Renting.Infrastructure.Data;
 using Renting.Infrastructure.Repository;
 
 namespace Renting_Immobile.Controllers
 {
+    [Authorize]
     public class VillaController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
