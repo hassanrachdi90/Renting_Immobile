@@ -4,6 +4,7 @@ using Renting.Application.Common.Interfaces;
 using Renting.Domain.Entities;
 using Renting.Infrastructure.Data;
 using Renting.Infrastructure.Repository;
+using Stripe;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +30,7 @@ builder.Services.Configure<IdentityOptions>(option =>
 builder.Services.AddIdentity<ApplicationUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 var app = builder.Build();
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
