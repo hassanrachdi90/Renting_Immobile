@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Renting.Application.Common.Interfaces;
+using Renting.Application.Utility;
 using Renting.Domain.Entities;
 using Renting_Immobile.Models;
 using Renting_Immobile.ViewModels;
@@ -31,12 +32,14 @@ namespace Renting_Immobile.Controllers
         {
             //Thread.Sleep(2000);
             var villaList= _unitOfWork.Villa.GetAll(includeProperties: "VillaAmenity").ToList();
+            var villaNumberList=_unitOfWork.VillaNumber.GetAll().ToList();
+            var bookedVillas=_unitOfWork.Booking.GetAll(u=>u.Status==SD.StatusApproved || u.Status == SD.StatusChechedIn ).ToList();
             foreach (var villa in villaList)
             {
-                if (villa.Id % 2 == 0)
-                {
-                    villa.IsAvailable = false;
-                }
+                //int roomAvailable = SD.VillaRoomsAvailable_Count(villa.Id, villaNumberList, bookedVillas, checkInDate, nights);
+                int roomAvailable = SD.VillaRoomsAvailable_Count(villa.Id, villaNumberList, checkInDate, nights, bookedVillas);
+                villa.IsAvailable=roomAvailable > 0 ? true : false ;
+
             }
             HomeVM homeVM = new()
             {
