@@ -76,23 +76,23 @@ namespace Renting_Immobile.Controllers
             return View(amenityVM);
         }
         [HttpPost]
-        public IActionResult Update(AmenityVM AmenityVM)
+        public IActionResult Update(AmenityVM amenityVM)
         {
            
             if (ModelState.IsValid )
             {
-                _unitOfWork.Amenity.Update(AmenityVM.Amenity);
+                _unitOfWork.Amenity.Update(amenityVM.Amenity);
                 _unitOfWork.Save();
                 TempData["success"] = "The amenitiy has been update successfully .";
                 return RedirectToAction(nameof(Index));
 
             }
-            AmenityVM.VillaList = _unitOfWork.Villa.GetAll().Select(x => new SelectListItem
+            amenityVM.VillaList = _unitOfWork.Villa.GetAll().Select(x => new SelectListItem
                          {
                                   Text = x.Name,
                                   Value = x.Id.ToString()
                          });
-            return View(AmenityVM);
+            return View(amenityVM);
         }
 
         public IActionResult Delete(int amenityId)

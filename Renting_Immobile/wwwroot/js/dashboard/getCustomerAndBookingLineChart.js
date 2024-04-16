@@ -41,17 +41,17 @@ function loadLineChart(id, data) {
             enabled: false,
         },
         markers: {
-            size: 6,
+            size: 3,
             strokeWidth: 0,
             hover: {
-                size: 9
+                size: 7
             }
         },
         xaxis: {
             categories: data.categories,
             labels: {
                 style: {
-                    colors: "#fff",
+                    colors: "#ddd",
                 },
             }
         },
