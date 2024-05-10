@@ -65,30 +65,126 @@ namespace Renting_Immobile.Controllers
             return View(booking);
         }
 
+        //[Authorize]
+        //[HttpPost]
+        //public IActionResult FinalizeBooking(Booking booking)
+        //{
+        //    var villa = _unitOfWork.Villa.Get(x => x.Id == booking.VillaId);
+        //    booking.TotalCost = villa.Price * booking.Nights;
+        //    var villaNumberList = _unitOfWork.VillaNumber.GetAll().ToList();
+        //    var bookedVillas = _unitOfWork.Booking.GetAll(u => u.Status == SD.StatusApproved || u.Status == SD.StatusChechedIn).ToList();
+
+
+
+        //        int roomAvailable = SD.VillaRoomsAvailable_Count(villa.Id, villaNumberList,booking.CheckInDate, booking.Nights, bookedVillas);
+        //    if (roomAvailable==0)
+        //    {
+        //        TempData["error"] = "Room has been sold out!";
+        //        //no rooms available
+        //        return RedirectToAction(nameof(FinalizeBooking), new
+        //        {
+        //            villaId = booking.VillaId,
+        //            checkInDate = booking.CheckInDate,
+        //            nights = booking.Nights
+        //        });
+        //    }
+
+
+        //    booking.Status = SD.StatusPending;
+        //    booking.BookingDate = DateTime.Now;
+        //    _unitOfWork.Booking.Add(booking);
+        //    _unitOfWork.Save();
+
+        //    StripeConfiguration.ApiKey = "sk_test_51P5A7bA1tQ4pOkhIOk9TjwX7qtxLQRzey9pz8Qcapi1rFJehpXipKQ9pLf4KcHJH9ZpTAzXi4yuf3BnvykalHmFY00Gr2c9Shn";
+        //    var domain = Request.Scheme + "://" + Request.Host.Value + "/";
+
+        //    var options = new SessionCreateOptions
+        //    {
+        //        PaymentMethodTypes = new List<string> { "card" },
+        //        LineItems = new List<SessionLineItemOptions>
+        //{
+        //    new SessionLineItemOptions
+        //    {
+        //        PriceData = new SessionLineItemPriceDataOptions
+        //        {
+        //            UnitAmount = (long)(booking.TotalCost * 100),
+        //            Currency = "MAD",
+        //            ProductData = new SessionLineItemPriceDataProductDataOptions
+        //            {
+        //                Name = villa.Name,
+        //            }
+        //        },
+        //        Quantity = 1,
+        //    }
+        //},
+        //        SuccessUrl = domain + $"booking/BookingConfirmation?bookingId={booking.Id}",
+        //        CancelUrl = domain + $"booking/FinalizeBooking?villaId={booking.VillaId}&checkInDate={booking.CheckInDate}&nights={booking.Nights}",
+        //        Mode = "payment",
+        //    };
+
+        //    var service = new SessionService();
+        //    var session = service.Create(options);
+
+        //    // Mettez à jour la réservation avec les informations de session Stripe
+        //    _unitOfWork.Booking.UpdateStripePaymentID(booking.Id, session.Id, session.PaymentIntentId);
+        //    _unitOfWork.Save();
+        //    Response.Headers.Add("Location",session.Url);
+        //    return new StatusCodeResult(303);
+
+
+        //}
+
         [Authorize]
         [HttpPost]
         public IActionResult FinalizeBooking(Booking booking)
         {
-            var villa = _unitOfWork.Villa.Get(x => x.Id == booking.VillaId);
-            booking.TotalCost = villa.Price * booking.Nights;
-            var villaNumberList = _unitOfWork.VillaNumber.GetAll().ToList();
-            var bookedVillas = _unitOfWork.Booking.GetAll(u => u.Status == SD.StatusApproved || u.Status == SD.StatusChechedIn).ToList();
-            
-            
-                
-                int roomAvailable = SD.VillaRoomsAvailable_Count(villa.Id, villaNumberList,booking.CheckInDate, booking.Nights, bookedVillas);
-            if (roomAvailable==0)
+            // Vérifier si l'objet de réservation reçu a des valeurs correctes
+            if (booking == null || booking.VillaId <= 0 || booking.CheckInDate == null || booking.Nights <= 0)
             {
-                TempData["error"] = "Room has been sold out!";
-                //no rooms available
+                TempData["error"] = "Détails de réservation invalides !";
+                return RedirectToAction(nameof(FinalizeBooking), new
+                {
+                    villaId = booking?.VillaId ?? 0,
+                    checkInDate = booking?.CheckInDate.ToString("dd/MM/yyyy") ?? "",
+                    nights = booking?.Nights ?? 0
+                });
+            }
+
+            // Convertir CheckInDate en type DateOnly
+            DateOnly parsedCheckInDate;
+            if (!DateOnly.TryParseExact(booking.CheckInDate.ToString(), "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out parsedCheckInDate))
+            {
+                TempData["error"] = "Format de CheckInDate invalide !";
                 return RedirectToAction(nameof(FinalizeBooking), new
                 {
                     villaId = booking.VillaId,
-                    checkInDate = booking.CheckInDate,
+                    checkInDate = booking.CheckInDate.ToString(),
                     nights = booking.Nights
                 });
             }
 
+            // Calculer CheckOutDate basé sur CheckInDate analysé et Nights fournis
+            var checkOutDate = parsedCheckInDate.AddDays(booking.Nights);
+
+            // Autre logique dans votre méthode...
+
+            // Continuation de votre méthode
+            var villa = _unitOfWork.Villa.Get(x => x.Id == booking.VillaId);
+            booking.TotalCost = villa.Price * booking.Nights;
+            var villaNumberList = _unitOfWork.VillaNumber.GetAll().ToList();
+            var bookedVillas = _unitOfWork.Booking.GetAll(u => u.Status == SD.StatusApproved || u.Status == SD.StatusChechedIn).ToList();
+
+            int roomAvailable = SD.VillaRoomsAvailable_Count(villa.Id, villaNumberList, parsedCheckInDate, booking.Nights, bookedVillas);
+            if (roomAvailable == 0)
+            {
+                TempData["error"] = "La chambre a été vendue !";
+                return RedirectToAction(nameof(FinalizeBooking), new
+                {
+                    villaId = booking.VillaId,
+                    checkInDate = parsedCheckInDate.ToString(),
+                    nights = booking.Nights
+                });
+            }
 
             booking.Status = SD.StatusPending;
             booking.BookingDate = DateTime.Now;
@@ -118,21 +214,21 @@ namespace Renting_Immobile.Controllers
             }
         },
                 SuccessUrl = domain + $"booking/BookingConfirmation?bookingId={booking.Id}",
-                CancelUrl = domain + $"booking/FinalizeBooking?villaId={booking.VillaId}&checkInDate={booking.CheckInDate}&nights={booking.Nights}",
+                CancelUrl = domain + $"booking/FinalizeBooking?villaId={booking.VillaId}&checkInDate={parsedCheckInDate.ToString("dd/MM/yyyy")}&nights={booking.Nights}",
                 Mode = "payment",
             };
 
             var service = new SessionService();
             var session = service.Create(options);
 
-            // Mettez à jour la réservation avec les informations de session Stripe
+            // Mettre à jour la réservation avec les informations de session Stripe
             _unitOfWork.Booking.UpdateStripePaymentID(booking.Id, session.Id, session.PaymentIntentId);
             _unitOfWork.Save();
-            Response.Headers.Add("Location",session.Url);
-            return new StatusCodeResult(303);
 
-            
+            // Rediriger vers l'URL de session Stripe
+            return Redirect(session.Url);
         }
+
 
         [Authorize]
         public IActionResult BookingConfirmation(int bookingId)
