@@ -347,7 +347,7 @@ namespace Renting_Immobile.Controllers
 
             row0.Cells[0].AddParagraph().AppendText("NIGHTS");
             row0.Cells[0].Width = 80;
-            row0.Cells[1].AddParagraph().AppendText("VILLA");
+            row0.Cells[1].AddParagraph().AppendText("LOGEMENT");
             row0.Cells[1].Width = 220;
             row0.Cells[2].AddParagraph().AppendText("PRICE PER NIGHT");
             row0.Cells[3].AddParagraph().AppendText("TOTAL");

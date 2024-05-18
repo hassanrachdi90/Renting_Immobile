@@ -93,7 +93,7 @@ namespace Renting_Immobile.Controllers
             {
                 shape.TextBody.Text = string.Format("Max Occupancy : {0} adults", villa.Occupancy);
             }
-            shape = slide.Shapes.FirstOrDefault(u => u.ShapeName == "txtVillaSize") as IShape;
+            shape = slide.Shapes.FirstOrDefault(u => u.ShapeName == "txtSize") as IShape;
             if (shape is not null)
             {
                 shape.TextBody.Text = string.Format("Villa Size: {0} sqft", villa.Sqft);

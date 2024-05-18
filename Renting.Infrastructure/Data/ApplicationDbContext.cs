@@ -30,7 +30,7 @@ namespace Renting.Infrastructure.Data
                 new Villa
                 {
                     Id = 1,
-                    Name = "Royal Villa",
+                    Name = "Royal Appartement",
                     Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                     ImageUrl = "https://placehold.co/600x400",
                     Occupancy = 4,
@@ -40,7 +40,7 @@ namespace Renting.Infrastructure.Data
                 new Villa
                 {
                      Id = 2,
-                     Name = "Premium Pool Villa",
+                     Name = "Premium Pool Studio",
                      Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                      ImageUrl = "https://placehold.co/600x401",
                      Occupancy = 4,
