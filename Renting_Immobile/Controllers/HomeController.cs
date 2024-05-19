@@ -152,7 +152,7 @@ namespace Renting_Immobile.Controllers
             MemoryStream memoryStream = new();
             presentation.Save(memoryStream);
             memoryStream.Position = 0;
-            return File(memoryStream, "application/pptx", "villa.pptx");
+            return File(memoryStream, "application/pptx", "Logoemnt.pptx");
 
 
         }
